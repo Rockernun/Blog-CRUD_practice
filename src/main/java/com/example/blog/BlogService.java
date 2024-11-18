@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Service
+@Service  // 이거 자체가 빈 등록하는 거임
 public class BlogService {
     private final BlogRepository blogRepository;
 
@@ -19,5 +19,9 @@ public class BlogService {
 
     public List<Article> findAll() {
         return blogRepository.findAll();
+    }
+
+    public Article findById(long id) {
+        return blogRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다 : " + id));
     }
 }
