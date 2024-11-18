@@ -2,6 +2,7 @@ package com.example.blog;
 
 import com.example.blog.domain.Article;
 import com.example.blog.dto.AddArticleRequest;
+import com.example.blog.dto.UpdateArticleRequest;
 import com.example.blog.repository.BlogRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,5 +123,32 @@ class BlogApiControllerTest {
         List<Article> articles = blogRepository.findAll();
 
         assertThat(articles).isEmpty();
+    }
+
+    @DisplayName("updateArticle: 블로그 글 수정 성공했습니다.")
+    @Test
+    public void updateArticle() throws Exception {
+        // given
+        final String url = "/api/articles/{id}";
+        final String title = "title";
+        final String content = "content";
+
+        Article savedArticle = blogRepository.save(Article.builder().title(title).content(content).build());
+
+        final String newTitle = "new Title";
+        final String newContent = "new Content";
+
+        UpdateArticleRequest request = new UpdateArticleRequest(newTitle, newContent);
+
+        // when
+        ResultActions result = mockMvc.perform(put(url, savedArticle.getId()).contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(request)));
+
+        // then
+        result.andExpect(status().isOk());
+
+        Article article = blogRepository.findById(savedArticle.getId()).get();
+
+        assertThat(article.getTitle()).isEqualTo(newTitle);
+        assertThat(article.getContent()).isEqualTo(newContent);
     }
 }
